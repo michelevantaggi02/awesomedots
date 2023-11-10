@@ -1,0 +1,10 @@
+{
+    "Lua.diagnostics.globals": [
+        "awesome",
+        "client",
+        "root",
+        "timer",
+        "mouse",
+        "create_button"
+    ]
+}
