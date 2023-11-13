@@ -115,12 +115,13 @@ local dashboard = awful.popup {
         layout = wibox.layout.flex.horizontal,
       },
       buttons,
+      top.turnoff,
       -- themeswitcher,
       --tray,
       spacing = dpi(15),
       layout = wibox.layout.fixed.vertical,
     },
-    margins = {left = dpi(2 +20), top= dpi(20), bottom = dpi(20), right = dpi(20)},
+    margins = {left = dpi(20), top= dpi(20), bottom = dpi(20), right = dpi(20)},
     forced_width = beautiful.dashboard_width,
     widget = wibox.container.margin
   },
@@ -128,10 +129,10 @@ local dashboard = awful.popup {
   visible = false,
   bg = beautiful.bg,
   ontop = true,
-  opacity = .97,
+  opacity = .8,
   placement = function(c)
     (awful.placement.top_left)(c,
-          { margins = { left = beautiful.bar_width - (beautiful.useless_gap * 4) } })--beautiful.bar_width + (beautiful.useless_gap * 4), bottom = beautiful.useless_gap * 2 } })
+          { margins = { topd = beautiful.bar_width - (beautiful.useless_gap * 4) } })--beautiful.bar_width + (beautiful.useless_gap * 4), bottom = beautiful.useless_gap * 2 } })
   end,
 }
 
