@@ -1,4 +1,5 @@
 local help = require("help")
+local signals = require("signals")
 local M = {}
 
 -- Net
@@ -160,6 +161,12 @@ end
 M.clock:buttons(gears.table.join(
   awful.button({}, 1, function()
     M.cal.toggle()
+  end)
+))
+
+M.vol:buttons(gears.table.join(
+  awful.button({}, 1, function ()
+    signals.toggle_vol_mute()
   end)
 ))
 

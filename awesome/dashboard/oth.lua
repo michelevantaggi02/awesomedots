@@ -132,7 +132,7 @@ M.cal = wibox.widget {
   {
     {
       {
-        format = help.fg("%A, %B %e", beautiful.pri, "bold"),
+        format = help.fg("%A %e %B", beautiful.pri, "bold"),
         refresh = 1,
         widget = wibox.widget.textclock,
         align = "center"
