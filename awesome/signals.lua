@@ -44,7 +44,7 @@ M.bri = function()
 end
 
 gears.timer {
-  timeout = 30,
+  timeout = 5,
   call_now = true,
   autostart = true,
   callback = function()

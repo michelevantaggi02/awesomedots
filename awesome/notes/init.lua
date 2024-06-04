@@ -14,7 +14,7 @@ local notes = wibox({
   halign  = "left",
   valign  = "center",
   ontop   = false,
-  visible = false,
+  visible = true,
   fg      = beautiful.pri,
   height  = dpi(200),
   width   = dpi(350),
@@ -32,7 +32,7 @@ gears.timer {
     awful.spawn.easy_async_with_shell(
       "curl -s $LINK$(date -I).json | jq .\"[]?\"",
       function(out)
-        icon.markup = "> " .. out:gsub("\"", ""):gsub("\n", "\n> ")
+        icon.markup = "> " .. out:gsub("[", ""):gsub("]", ""):gsub("\"", ""):gsub("\n", "\n> ")
         local _, count = string.gsub(out, "\n", "")
         notes.height = dpi((count + 7) * 20)
         notes.visible = true
@@ -150,7 +150,7 @@ gears.timer {
       awful.spawn.easy_async_with_shell(
         "sensors -u 2>> /dev/null | grep \"" .. text .. "\" -A 3 | grep -o \"input: [0-9]*\" | grep -o \"[0-9]*\"",
         function(out)
-          temps:get_children_by_id(text .. "-text")[1].text = out.."°C"
+          temps:get_children_by_id(text .. "-text")[1].text = out .. "°C"
           temps:get_children_by_id(text .. "-bar")[1].value = tonumber(out)
         end
       )
@@ -177,7 +177,7 @@ local graph = wibox.widget({
   step_width = 3,
   step_spacing = 1,
   widget = wibox.widget.graph
-  
+
 })
 
 bats:setup(
@@ -193,7 +193,7 @@ bats:setup(
       margins = { top = dpi(12), bottom = dpi(12) },
       widget = wibox.container.margin
     },
-    
+
     {
       graph,
       margins = dpi(12),
@@ -210,3 +210,84 @@ end)
 
 awful.placement.right(bats, { margins = { right = beautiful.useless_gap * 4 } })
 --awful.placement.stretch_down(graph)
+
+local files = wibox({
+  type    = "popup",
+  halign  = "left",
+  valign  = "center",
+  ontop   = false,
+  visible = true,
+  fg      = beautiful.pri,
+  height  = dpi(600),
+  width   = dpi(300),
+  opacity = 0.75
+})
+
+local function create_file(name)
+  icon = "folder"
+
+  if name.find(".") then
+    icon = "file"
+  end
+  return {
+    {
+      {
+        widget = wibox.widget.textbox,
+        text = icon,
+
+      },
+      {
+        widget = wibox.widget.textbox,
+        text = name
+      },
+
+      layout = wibox.layout.fixed.horizontal
+    },
+    widget = wibox.container.margin,
+    margins = { left = dpi(10), right = dpi(10) }
+  }
+end
+
+local item_list = { layout = wibox.layout.fixed.vertical, id = "item_list" }
+local indx = 0
+
+
+files:setup({
+  {
+    wibox.widget {
+      align = "center",
+      valign = "top",
+      font = beautiful.fontname .. "20",
+      markup = "Listaw",
+      widget = wibox.widget.textbox
+    },
+    margins = { top = dpi(12), bottom = dpi(12) },
+    widget = wibox.container.margin
+  },
+  {
+    item_list,
+    margins = { left = dpi(12) },
+    widget = wibox.container.margin
+  },
+  layout = wibox.layout.fixed.vertical
+})
+
+gears.timer {
+  timeout = 1,
+  call_now = true,
+  autostart = true,
+  callback = function()
+    awful.spawn.easy_async_with_shell("ls ~/Scrivania | col",
+      function(out)
+        indx = 0
+        for line in out:gmatch("([^\n]*)\n?") do
+          item_list[indx] = create_file(line)
+          indx = indx + 1
+        end
+
+        files:get_children_by_id("item_list")[1] = item_list
+      end)
+  end
+}
+
+awful.placement.left(files)

@@ -1,4 +1,5 @@
 local help = {}
+local beautiful = require("beautiful")
 
 help.rrect = function(rad)
   return function(cr, width, height)
@@ -22,6 +23,7 @@ help.prrect = function(radius, tl, tr, br, bl)
 end
 
 help.fg = function(text, color, thickness)
+  color = color or "red"
   return "<span foreground='" .. color .. "' font-weight='" .. thickness .. "'>" .. text .. "</span>"
 end
 
@@ -38,10 +40,20 @@ help.write_to_file = function(path, content)
   activethemefile:close()
 end
 
-help.randomize_wallpaper = function()
+help.call_wal = function ()
+  awful.spawn.easy_async_with_shell("wal -i "..beautiful.theme_dir .. beautiful.activetheme .. "/wallpapers/ -n && betterlockscreen -u \"$(< \"${HOME}/.cache/wal/wal\")\"")
+end
 
-  awful.spawn.easy_async_with_shell("feh --bg-fill --randomize " ..
-    beautiful.theme_dir .. beautiful.activetheme .. "/wallpapers/*")
+help.randomize_wallpaper = function()
+  awful.spawn.easy_async_with_shell("wal -i "..beautiful.theme_dir .. beautiful.activetheme .. "/wallpapers/ -n && feh --bg-fill \"$(< \"${HOME}/.cache/wal/wal\")\"  ", function ()
+  awesome.restart()
+    
+  end)
+
+
+  
+ -- awful.spawn.easy_async_with_shell("feh --bg-fill --randomize " ..
+  --  beautiful.theme_dir .. beautiful.activetheme .. "/wallpapers/*")
 end
 
 help.screenshot = function()

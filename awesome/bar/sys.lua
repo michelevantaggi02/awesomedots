@@ -27,7 +27,7 @@ M.battery = wibox.widget {
 local battery_val = ""
 local battery_color = beautiful.fg
 local battery_tooltip = awful.tooltip {
-  margins = {left = dpi(12), right = dpi(12), bottom = dpi(12),},
+  margins = { left = dpi(12), right = dpi(12), bottom = dpi(12), },
   fg = battery_color,
   bg = beautiful.bg,
   preferred_alignments = "middle",
@@ -37,7 +37,7 @@ local battery_tooltip = awful.tooltip {
 
 battery_tooltip:add_to_object(M.battery)
 M.battery:connect_signal("mouse::enter", function()
-  battery_tooltip.text = battery_val .. "%"
+  battery_tooltip.markup = help.fg(battery_val .. "%", battery_color, "bold")
 end)
 
 -- Clock
@@ -146,7 +146,7 @@ M.cal = awful.popup {
   ontop     = true,
   placement = function(c)
     (awful.placement.top_right)(c,
-          { margins = { right = (beautiful.useless_gap * 4), top = beautiful.bar_width + beautiful.useless_gap * 2 } })
+          { margins = { right = (beautiful.useless_gap * 4), top = beautiful.bar_width } })
   end,
 }
 
@@ -165,7 +165,7 @@ M.clock:buttons(gears.table.join(
 ))
 
 M.vol:buttons(gears.table.join(
-  awful.button({}, 1, function ()
+  awful.button({}, 1, function()
     signals.toggle_vol_mute()
   end)
 ))
@@ -177,6 +177,52 @@ awesome.connect_signal("net::value", function(status)
     M.net.opacity = 0.25
   end
 end)
+
+local shown = 40
+
+local popText = wibox.widget({
+  markup = "10",
+  widget = wibox.widget.textbox,
+  align = "center",
+  font = beautiful.fontname .. "30"
+})
+
+
+local popBat = wibox({
+  type = "popup",
+  halign = "center",
+  valign = "center",
+  ontop = true,
+  visible = false,
+  bg = beautiful.bg,
+  opacity = .8,
+  height = dpi(200),
+  width = dpi(200)
+})
+
+popBat:setup({
+  {
+    wibox.widget({
+      markup = help.fg("\u{f071}", beautiful.err, "bold"),
+      widget = wibox.widget.textbox,
+      align = "center",
+      font = beautiful.fontname .. "50"
+    }),
+    margins = {top = dpi(20), left = dpi(20), right = dpi(20)},
+    widget = wibox.container.margin
+  },
+  popText,
+
+  layout = wibox.layout.flex.vertical
+})
+
+awful.placement.centered(popBat)
+
+popBat:buttons(gears.table.join(
+  awful.button({}, 1, function()
+    popBat.visible = false
+  end)
+))
 
 awesome.connect_signal("bat::value", function(status, charge)
   local icon = "\u{e19c}"
@@ -194,6 +240,7 @@ awesome.connect_signal("bat::value", function(status, charge)
   end
   if status == "Charging" or status == "Full" then
     battery_color = beautiful.ok
+    shown = 40
     if charge >= 90 then
       naughty.notify({
         title = "Battery charged",
@@ -203,15 +250,14 @@ awesome.connect_signal("bat::value", function(status, charge)
     end
   elseif charge < 20 and status == "Discharging" then
     battery_color = beautiful.err
-    naughty.notify({
-      title = "Low battery",
-      text = charge .. "% battery remaining",
-      preset = naughty.config.presets.critical,
-      timeout = 4
-    })
+    if charge <= shown / 2 then
+      popBat.visible = true
+      shown = shown / 2
+    end 
   end
   icon = help.fg(icon, battery_color, "normal")
   M.battery.markup = icon
+  popText.markup = help.fg(charge .. "%", beautiful.err, "bold")
   battery_val = charge
 end)
 

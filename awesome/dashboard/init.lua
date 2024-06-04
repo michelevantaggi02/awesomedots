@@ -1,6 +1,7 @@
 local wid = require("dashboard.wid")
 local sli = require("dashboard.sli")
 local top = require('dashboard.oth')
+local rubato = require("lib.rubato")
 --local play = require("dashboard.play")
 
 local sep = wibox.widget {
@@ -97,6 +98,8 @@ local tray = wibox.widget {
   widget = wibox.widget.systray
 }
 
+local dash_placement =  { margins = { top = beautiful.bar_width - (beautiful.useless_gap * 4) } }
+
 local dashboard = awful.popup {
   widget = {
     {
@@ -125,19 +128,31 @@ local dashboard = awful.popup {
     forced_width = beautiful.dashboard_width,
     widget = wibox.container.margin
   },
-  shape = help.rrect(beautiful.br),
+  shape = help.prrect(beautiful.br, false, false, false, false),
   visible = false,
   bg = beautiful.bg,
   ontop = true,
   opacity = .8,
   placement = function(c)
-    (awful.placement.top_left)(c,
-          { margins = { topd = beautiful.bar_width - (beautiful.useless_gap * 4) } })--beautiful.bar_width + (beautiful.useless_gap * 4), bottom = beautiful.useless_gap * 2 } })
+    (awful.placement.top_left)(c,dash_placement)--beautiful.bar_width + (beautiful.useless_gap * 4), bottom = beautiful.useless_gap * 2 } })
   end,
+}
+
+local timed = rubato.timed {
+  duration = 1/4,
+  easing = rubato.quadratic,
+  subscribed = function (val)
+    dashboard.opacity = val;
+  end
 }
 
 dashboard.toggle = function()
   dashboard.visible = not dashboard.visible
+  if dashboard.opacity == 0 then
+    timed.target = .8
+  else
+    timed.target = 0
+  end
 end
 
 return dashboard

@@ -5,6 +5,7 @@ local theme_path = gfs.get_configuration_dir() .. "/theme/"
 local theme = {}
 
 theme.theme_dir = theme_path
+--awful.spawn.easy_async_with_shell("wal -i "..theme.theme_dir .. "michi/wallpapers/ -n ")
 local activethemefile = io.open(theme.theme_dir .. "activetheme", "r")
 if not activethemefile then
   return
@@ -83,5 +84,6 @@ theme.tag                             = theme_path .. "tag.svg"
 theme.tag_sel                         = theme_path .. "tag_sel.svg"
 
 theme.playerctl_player                = { "mpd", "%any" }
+
 
 return theme

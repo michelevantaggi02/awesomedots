@@ -35,9 +35,13 @@ awful.layout.layouts = {
   awful.layout.suit.floating,
 }
 
+
+
+
 -- Virtual desktops/ Tabs
 awful.screen.connect_for_each_screen(function(s)
-  help.randomize_wallpaper()
+  help.call_wal()
+  awful.spawn.easy_async_with_shell("feh --bg-fill \"$(< \"${HOME}/.cache/wal/wal\")\"")
   local tagTable = {}
   for i = 1, keys.tags do
     table.insert(tagTable, tostring(i))
@@ -63,6 +67,7 @@ gears.timer {
 }
 
 -- Autostart
-awful.spawn("picom -b", false)
+awful.spawn("picom -b --log-file /home/michi/Documenti/picom.log", false)
 awful.spawn("nm-applet")
-awful.spawn("xinput set-prop 12 189 0")
+awful.spawn("optimus-manager-qt")
+awful.spawn("xinput disable 12")
