@@ -1,5 +1,6 @@
 local sys = require("bar.sys")
 local oth = require("bar.oth")
+local key = require("bar.key")
 
 local tags = function(s)
   return wibox.widget {
@@ -36,6 +37,7 @@ local sys = wibox.widget { {
       {
         widget = wibox.widget.systray,
       },
+      key,
       sys.vol,
       sys.battery,
       spacing = dpi(20),
